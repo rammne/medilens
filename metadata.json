@@ -1,0 +1,7 @@
+{
+  "name": "MediLens",
+  "description": "A patient companion that uses AI to explain medical documents.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
