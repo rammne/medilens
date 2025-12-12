@@ -7,6 +7,7 @@ import { MarkdownView } from './components/MarkdownView';
 import { ArrowLeft, Clock, Trash2, ChevronRight, AlertCircle, FileText, Sparkles, Loader2 } from 'lucide-react';
 
 const STORAGE_KEY = 'medilens_history';
+const APP_VERSION = '1.0.2'; // Increment this to visually verify updates
 
 export default function App() {
   const [view, setView] = useState<ViewState>('home');
@@ -201,6 +202,10 @@ export default function App() {
             <p className="text-sm">{error}</p>
           </div>
         )}
+
+        <div className="mt-8 text-center">
+            <p className="text-xs text-slate-300">v{APP_VERSION}</p>
+        </div>
       </div>
     </div>
   );
