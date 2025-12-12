@@ -4,7 +4,18 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
+  // The third argument '' ensures we load all variables, not just those prefixed with VITE_
   const env = loadEnv(mode, process.cwd(), '');
+  
+  // Prioritize the system env var (Vercel), then the loaded env file
+  const apiKey = process.env.API_KEY || env.API_KEY;
+
+  // Log for debugging (will appear in Vercel build logs)
+  if (!apiKey) {
+    console.warn("WARNING: API_KEY is not defined in the build environment!");
+  } else {
+    console.log("Success: API_KEY found in build environment.");
+  }
 
   return {
     plugins: [
@@ -37,7 +48,6 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-          // Cache Tailwind CDN for offline usage
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/cdn\.tailwindcss\.com\/.*/i,
@@ -46,7 +56,7 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'tailwindcss-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                  maxAgeSeconds: 60 * 60 * 24 * 365
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
@@ -58,8 +68,9 @@ export default defineConfig(({ mode }) => {
       })
     ],
     define: {
-      // Map the process.env.API_KEY variable used in geminiService to the build-time environment variable
-      'process.env.API_KEY': JSON.stringify(env.API_KEY)
+      // Safely inject the API key. If it's undefined, we inject an empty string
+      // so the code doesn't crash on 'process is not defined', but we can check for empty string later.
+      'process.env.API_KEY': JSON.stringify(apiKey || '')
     }
   };
 });
